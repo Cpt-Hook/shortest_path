@@ -1,0 +1,7 @@
+XXXXXX
+X X  X
+XX   X
+X X  X
+XXXXXX
+start 3, 3
+end 1, 1
