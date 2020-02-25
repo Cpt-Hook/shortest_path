@@ -8,7 +8,7 @@
 #include <vector>
 #include "grid.h"
 
-bool bfs(Grid &grid, Coords &start, Coords &end, bool print=true);
-bool dfs(Grid &grid, Coords &start, Coords &end, bool print=true);
+std::tuple<bool, int, int> bfs(Maze &maze, bool print=true);
+std::tuple<bool, int, int> dfs(Maze &maze, bool print=true);
 
 #endif //STATE_SPACE_SEARCH_ALGORITHMS_H

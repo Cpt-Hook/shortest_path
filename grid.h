@@ -6,6 +6,13 @@
 #include <vector>
 #include <iostream>
 
+const char WALL_CHAR = 'X';
+const char PATH_CHAR = '#';
+const char CLOSED_CHAR = '-';
+const char OPEN_CHAR = '*';
+const char START_CHAR = 'S';
+const char END_CHAR = 'E';
+
 enum class STATE {
     OPEN, CLOSED, UNDISCOVERED
 };
@@ -17,8 +24,10 @@ enum COLOR_PAIR {
 struct Coords {
     int x, y;
 
-    bool operator==(const Coords &other);
+    bool operator==(const Coords &other) const;
 };
+
+std::ostream& operator<<(std::ostream &stream, const Coords &coords);
 
 struct Cell {
     Cell *prev;
@@ -33,11 +42,20 @@ struct Cell {
 
 using Grid = std::vector<std::vector<Cell>>;
 
-std::ostream& operator<<(std::ostream &stream, const Coords &coords);
-
-void print_grid(const Grid &grid);
-
 bool load_grid(Grid &grid, Coords &start, Coords &end, std::istream &stream=std::cin);
+
+class Maze {
+public:
+    Grid grid;
+    Coords start = {0, 0}, end = {0, 0};
+
+    bool load_maze(std::istream &stream=std::cin);
+    void print_maze() const;
+
+    Cell& get_cell(Coords coords);
+    Cell& get_start_cell();
+    Cell& get_end_cell();
+};
 
 #define STATE_SPACE_SEARCH_GRID_H
 #endif //STATE_SPACE_SEARCH_GRID_H

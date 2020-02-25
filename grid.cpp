@@ -12,17 +12,17 @@ Cell::Cell(char print_char, Coords coords, bool blank) :
 
 void Cell::print() const {
     switch(print_char) {
-        case '#':
+        case PATH_CHAR:
             addch(print_char | COLOR_PAIR(GREEN_PAIR));
             break;
-        case '*':
+        case OPEN_CHAR:
             addch(print_char | COLOR_PAIR(YELLOW_PAIR));
             break;
-        case '-':
+        case CLOSED_CHAR:
             addch(print_char | COLOR_PAIR(RED_PAIR));
             break;
-        case 'S':
-        case 'E':
+        case START_CHAR:
+        case END_CHAR:
             addch(print_char | COLOR_PAIR(BLUE_PAIR));
             break;
         default:
@@ -31,27 +31,7 @@ void Cell::print() const {
     }
 }
 
-std::ostream &operator<<(std::ostream &stream, const Coords &coords) {
-    stream << coords.x << ", " << coords.y;
-    return stream;
-}
-
-bool Coords::operator==(const Coords &other) {
-    return x == other.x && y == other.y;
-}
-
-void print_grid(const Grid &grid) {
-    for(const std::vector<Cell> &row : grid) {
-       for(const Cell &cell : row) {
-           cell.print();
-       }
-       addch('\n');
-    }
-    refresh();
-}
-
-
-bool load_grid(Grid &grid, Coords &start, Coords &end, std::istream &istream) {
+bool Maze::load_maze(std::istream &istream) {
     std::string line;
     Coords current = {0, 0};
 
@@ -87,3 +67,35 @@ bool load_grid(Grid &grid, Coords &start, Coords &end, std::istream &istream) {
     grid[end.y][end.x].print_char = 'E';
     return true;
 }
+
+Cell& Maze::get_cell(Coords coords) {
+    return grid[coords.y][coords.x];
+}
+
+Cell& Maze::get_start_cell() {
+    return get_cell(start);
+}
+
+Cell& Maze::get_end_cell() {
+    return get_cell(end);
+}
+
+std::ostream &operator<<(std::ostream &stream, const Coords &coords) {
+    stream << coords.x << ", " << coords.y;
+    return stream;
+}
+
+bool Coords::operator==(const Coords &other) const {
+    return x == other.x && y == other.y;
+}
+
+void Maze::print_maze() const {
+    for(const std::vector<Cell> &row : grid) {
+       for(const Cell &cell : row) {
+           cell.print();
+       }
+       addch('\n');
+    }
+    refresh();
+}
+
