@@ -8,7 +8,7 @@
 #include <vector>
 #include "grid.h"
 
-bool bfs(Grid &grid, Coords &start, Coords &end);
-bool dfs(Grid &grid, Coords &start, Coords &end);
+bool bfs(Grid &grid, Coords &start, Coords &end, bool print=true);
+bool dfs(Grid &grid, Coords &start, Coords &end, bool print=true);
 
 #endif //STATE_SPACE_SEARCH_ALGORITHMS_H

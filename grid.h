@@ -10,6 +10,10 @@ enum class STATE {
     OPEN, CLOSED, UNDISCOVERED
 };
 
+enum COLOR_PAIR {
+    RED_PAIR = 1, BLUE_PAIR, YELLOW_PAIR, GREEN_PAIR
+};
+
 struct Coords {
     int x, y;
 
@@ -21,17 +25,17 @@ struct Cell {
     Coords coords;
     STATE state;
     char print_char;
+    bool blank;
 
-    explicit Cell(char print_char, Coords coords);
+    explicit Cell(char print_char, Coords coords, bool blank);
+    void print() const;
 };
 
 using Grid = std::vector<std::vector<Cell>>;
 
-std::ostream& operator<<(std::ostream &stream, const Cell &cell);
-
 std::ostream& operator<<(std::ostream &stream, const Coords &coords);
 
-void print_grid(Grid &grid);
+void print_grid(const Grid &grid);
 
 bool load_grid(Grid &grid, Coords &start, Coords &end, std::istream &stream=std::cin);
 

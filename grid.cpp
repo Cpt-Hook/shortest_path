@@ -5,36 +5,30 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <ncurses.h>
 
-const char *RED_ESCAPE = "\u001b[31m";
-const char *GREEN_ESCAPE = "\u001b[32m";
-const char *YELLOW_ESCAPE = "\u001b[33m";
-const char *BLUE_ESCAPE = "\u001b[34m";
-const char *RESET_ESCAPE = "\u001b[0m";
+Cell::Cell(char print_char, Coords coords, bool blank) :
+    prev(nullptr), coords(coords), state(STATE::UNDISCOVERED), print_char(print_char), blank(blank) {}
 
-Cell::Cell(char print_char, Coords coords) :
-    prev(nullptr), coords(coords), state(STATE::UNDISCOVERED), print_char(print_char) {}
-
-std::ostream &operator<<(std::ostream &stream, const Cell &cell) {
-    switch(cell.print_char) {
+void Cell::print() const {
+    switch(print_char) {
         case '#':
-            stream << GREEN_ESCAPE;
+            addch(print_char | COLOR_PAIR(GREEN_PAIR));
             break;
         case '*':
-            stream << YELLOW_ESCAPE;
+            addch(print_char | COLOR_PAIR(YELLOW_PAIR));
             break;
         case '-':
-            stream << RED_ESCAPE;
+            addch(print_char | COLOR_PAIR(RED_PAIR));
             break;
         case 'S':
         case 'E':
-            stream << BLUE_ESCAPE;
+            addch(print_char | COLOR_PAIR(BLUE_PAIR));
             break;
         default:
+            addch(print_char);
             break;
     }
-    stream << cell.print_char << RESET_ESCAPE;
-    return stream;
 }
 
 std::ostream &operator<<(std::ostream &stream, const Coords &coords) {
@@ -46,13 +40,14 @@ bool Coords::operator==(const Coords &other) {
     return x == other.x && y == other.y;
 }
 
-void print_grid(Grid &grid) {
+void print_grid(const Grid &grid) {
     for(const std::vector<Cell> &row : grid) {
        for(const Cell &cell : row) {
-          std::cout << cell;
+           cell.print();
        }
-       std::cout << std::endl;
+       addch('\n');
     }
+    refresh();
 }
 
 
@@ -81,12 +76,14 @@ bool load_grid(Grid &grid, Coords &start, Coords &end, std::istream &istream) {
         }else {
             grid.emplace_back();
             for(char cell_char : line) {
-                grid.back().emplace_back(cell_char, current);
+                grid.back().emplace_back(cell_char, current, cell_char == ' ');
                 ++current.x;
             }
             current.x = 0;
             ++current.y;
         }
     }
+    grid[start.y][start.x].print_char = 'S';
+    grid[end.y][end.x].print_char = 'E';
     return true;
 }
