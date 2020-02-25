@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string input_file_path = argv[1];
-    std::vector<std::vector<Cell>> grid, grid2;
+    Grid grid;
     Coords start{}, end{};
 
     auto istream = std::ifstream(input_file_path);
