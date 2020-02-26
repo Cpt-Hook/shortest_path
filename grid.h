@@ -7,9 +7,9 @@
 #include <iostream>
 
 const char WALL_CHAR = 'X';
-const char PATH_CHAR = '#';
+const char PATH_CHAR = 'o';
 const char CLOSED_CHAR = '-';
-const char OPEN_CHAR = '*';
+const char OPEN_CHAR = '#';
 const char START_CHAR = 'S';
 const char END_CHAR = 'E';
 
@@ -40,6 +40,8 @@ struct Cell {
     void print() const;
 };
 
+std::ostream& operator<<(std::ostream &stream, const Cell &cell);
+
 using Grid = std::vector<std::vector<Cell>>;
 
 bool load_grid(Grid &grid, Coords &start, Coords &end, std::istream &stream=std::cin);
@@ -56,6 +58,8 @@ public:
     Cell& get_start_cell();
     Cell& get_end_cell();
 };
+
+std::ostream& operator<<(std::ostream &stream, const Maze &maze);
 
 #define STATE_SPACE_SEARCH_GRID_H
 #endif //STATE_SPACE_SEARCH_GRID_H

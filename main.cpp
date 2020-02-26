@@ -33,7 +33,7 @@ std::tuple<bool, int, int> run_algorithm(ALGORITHM_NAME name, Maze &maze, bool p
             return dfs(maze, print);
             break;
         default:
-            return {false, -1, -1};
+            return {false, -1, -1}; // should never happen
             break;
     }
 }
@@ -50,10 +50,10 @@ void init_ncurses() {
     init_pair(GREEN_PAIR, COLOR_GREEN, -1);
 }
 
-void ncurses_print(ALGORITHM_NAME algorithm, Maze &maze, bool print) {
+void ncurses_print(ALGORITHM_NAME algorithm, Maze &maze) {
     init_ncurses();
 
-    auto [found_end, iteration_counter, path_length] = run_algorithm(algorithm, maze, print);
+    auto [found_end, iteration_counter, path_length] = run_algorithm(algorithm, maze, true);
 
     if(found_end) {
         printw("Iteration count: %d, path length: %d\n", iteration_counter, path_length);
@@ -71,6 +71,17 @@ void ncurses_print(ALGORITHM_NAME algorithm, Maze &maze, bool print) {
     endwin();
 }
 
+void normal_print(ALGORITHM_NAME algorithm, Maze &maze) {
+    auto [found_end, iteration_counter, path_length] = run_algorithm(algorithm, maze, false);
+
+    if(found_end) {
+        std::cout << "Iteration count: " << iteration_counter << ", path length: " << path_length << std::endl;
+    }else {
+        std::cout << "Iteration count: " << iteration_counter << ", path not found" << std::endl;
+    }
+    std::cout << maze;
+}
+
 int main(int argc, char *argv[]) {
     if(argc < 3) {
         std::cout << "Arguments: file_name algorithm [noprint]" << std::endl;
@@ -83,9 +94,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    std::string input_file_path = argv[1];
-    std::ifstream ifstream = std::ifstream(input_file_path);
-
+    std::ifstream ifstream = std::ifstream(argv[1]);
     if(!ifstream) {
         std::cout << "Could not open given file" << std::endl;
         return 1;
@@ -99,5 +108,9 @@ int main(int argc, char *argv[]) {
 
     bool print = !(argc >= 4 && strcmp(argv[3], "noprint") == 0);
 
-    ncurses_print(algorithm, maze, print);
+    if(print) {
+        ncurses_print(algorithm, maze);
+    } else {
+        normal_print(algorithm, maze);
+    }
 }

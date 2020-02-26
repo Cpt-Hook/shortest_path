@@ -85,6 +85,21 @@ std::ostream &operator<<(std::ostream &stream, const Coords &coords) {
     return stream;
 }
 
+std::ostream &operator<<(std::ostream &stream, const Cell &cell) {
+    stream << cell.print_char;
+    return stream;
+}
+
+std::ostream &operator<<(std::ostream &stream, const Maze &maze) {
+    for(const std::vector<Cell> &row : maze.grid) {
+       for(const Cell &cell : row) {
+           stream << cell;
+       }
+       stream << std::endl;
+    }
+    return stream;
+}
+
 bool Coords::operator==(const Coords &other) const {
     return x == other.x && y == other.y;
 }

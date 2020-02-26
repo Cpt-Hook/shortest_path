@@ -104,8 +104,9 @@ std::tuple<bool, int, int> bfs(Maze &maze, bool print) {
         }
         current->state = STATE::CLOSED;
 
+        ++iteration_counter;
         if(print) {
-            printw("Iteration %d\n", ++iteration_counter);
+            printw("Iteration %d\n", iteration_counter);
             find_path(current);
             maze.print_maze();
             revert_path(current);
@@ -119,7 +120,7 @@ std::tuple<bool, int, int> bfs(Maze &maze, bool print) {
         path_length = find_path(&maze.get_end_cell());
     }
 
-    return {found_end, iteration_counter, path_length};
+    return {found_end, ++iteration_counter, path_length}; //last iteration not printed, need to increment counter
 }
 
 inline void process_cell_dfs(std::stack<Cell*> &stack, Cell *next, Cell *current) {
@@ -167,8 +168,9 @@ std::tuple<bool, int, int> dfs(Maze &maze, bool print) {
         }
         current->state = STATE::CLOSED;
 
+        ++iteration_counter;
         if(print) {
-            printw("Iteration %d\n", ++iteration_counter);
+            printw("Iteration %d\n", iteration_counter);
             find_path(current);
             maze.print_maze();
             revert_path(current);
@@ -182,5 +184,5 @@ std::tuple<bool, int, int> dfs(Maze &maze, bool print) {
         path_length = find_path(&maze.get_end_cell());
     }
 
-    return {found_end, iteration_counter, path_length};
+    return {found_end, ++iteration_counter, path_length}; //last iteration not printed, need to increment counter
 }
