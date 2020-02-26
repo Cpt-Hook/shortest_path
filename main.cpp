@@ -4,7 +4,7 @@
 #include <cstring>
 #include <tuple>
 #include <cstring>
-#include "grid.h"
+#include "maze.h"
 #include "algorithms.h"
 
 enum class ALGORITHM_NAME {

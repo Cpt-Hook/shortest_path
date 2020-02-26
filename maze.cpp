@@ -1,7 +1,7 @@
 //
 // Created by standa on 2/23/20.
 //
-#include "grid.h"
+#include "maze.h"
 #include <iostream>
 #include <vector>
 #include <sstream>
