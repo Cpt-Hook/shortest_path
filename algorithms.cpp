@@ -110,7 +110,9 @@ std::tuple<bool, int, int> bfs(Maze &maze, bool print) {
             find_path(current);
             maze.print_maze();
             revert_path(current);
-            getch();
+            if(getch() == 'q') {
+                print = false;
+            }
             move(0,0);
         }
     }
@@ -174,7 +176,9 @@ std::tuple<bool, int, int> dfs(Maze &maze, bool print) {
             find_path(current);
             maze.print_maze();
             revert_path(current);
-            getch();
+            if(getch() == 'q') {
+                print = false;
+            }
             move(0, 0);
         }
     }
