@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -Wall -pedantic -std=c++17
+override CXXFLAGS += -Wall -pedantic -std=c++17
 LDLIBS := -lncurses
 
 debug: CXXFLAGS += -g -fsanitize=address
