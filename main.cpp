@@ -39,7 +39,8 @@ std::tuple<bool, int, int> run_algorithm(ALGORITHM_NAME name, Maze &maze, bool p
 }
 
 void init_ncurses() {
-    initscr(); cbreak();
+    initscr();
+    cbreak();
     noecho();
     keypad(stdscr, true);
     start_color();
