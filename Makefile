@@ -1,22 +1,20 @@
 CXX := g++
 override CXXFLAGS += -Wall -pedantic -std=c++17
 LDLIBS := -lncurses
+OBJS := main.o algorithms.o maze.o
+BINARY := main.out
+
+.PHONY: all clean debug
 
 debug: CXXFLAGS += -g -fsanitize=address
 
-all: main.o algorithms.o maze.o
-	${CXX} ${CXXFLAGS} -o main.out main.o algorithms.o maze.o ${LDLIBS}
+all: ${OBJS}
+	${CXX} ${CXXFLAGS} -o ${BINARY} ${OBJS} ${LDLIBS}
 
 debug: all
 
-main.o: main.cpp maze.h algorithms.h
-	${CXX} ${CXXFLAGS} -c -o main.o main.cpp
-
-algorithms.o: algorithms.cpp algorithms.h maze.h
-	${CXX} ${CXXFLAGS} -c -o algorithms.o algorithms.cpp
-
-maze.o: maze.cpp maze.h
-	${CXX} ${CXXFLAGS} -c -o maze.o maze.cpp
+%.o: %.cpp
+	${CXX} ${CXXFLAGS} -c -o $*.o $*.cpp
 
 clean:
-	rm -f *.o main.out
+	-rm -f *.o ${BINARY}
