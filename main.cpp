@@ -8,17 +8,20 @@
 #include "algorithms.h"
 
 enum class ALGORITHM_NAME {
-    INVALID, DFS, BFS
+    INVALID, DFS, BFS, RANDOM
 };
 
 const std::string dfs_string = "dfs";
 const std::string bfs_string = "bfs";
+const std::string random_string = "random";
 
 ALGORITHM_NAME check_algorithm_name(const std::string input) {
     if(input == dfs_string) {
         return ALGORITHM_NAME::DFS;
     }else if(input == bfs_string) {
         return ALGORITHM_NAME::BFS;
+    }else if(input == random_string) {
+        return ALGORITHM_NAME::RANDOM;
     }else {
         return ALGORITHM_NAME::INVALID;
     }
@@ -31,6 +34,9 @@ std::tuple<bool, int, int> run_algorithm(ALGORITHM_NAME name, Maze &maze, bool p
             break;
         case ALGORITHM_NAME::DFS:
             return dfs(maze, print);
+            break;
+        case ALGORITHM_NAME::RANDOM:
+            return random_search(maze, print);
             break;
         default:
             return {false, -1, -1}; // should never happen
@@ -86,6 +92,7 @@ void normal_print(ALGORITHM_NAME algorithm, Maze &maze) {
 int main(int argc, char *argv[]) {
     if(argc < 3) {
         std::cout << "Arguments: file_name algorithm [noprint]" << std::endl;
+        std::cout << "algorithm: 'dfs', 'bfs', 'random'" << std::endl;
         return 1;
     }
 

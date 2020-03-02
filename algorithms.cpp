@@ -7,6 +7,8 @@
 #include <tuple>
 #include <stack>
 #include <ncurses.h>
+#include <cstdlib>
+#include <ctime>
 
 inline Cell *right_cell(Grid &grid, Cell *cell) {
     if((int)grid[0].size() > cell->coords.x + 1 && grid[cell->coords.y][cell->coords.x + 1].blank) {
@@ -38,14 +40,6 @@ inline Cell *down_cell(Grid &grid, Cell *cell) {
     return nullptr;
 }
 
-inline void process_cell_bfs(std::queue<Cell*> &queue, Cell *next, Cell *current) {
-    if (next->state == STATE::UNDISCOVERED) {
-        next->state = STATE::OPEN;
-        next->prev = current;
-        queue.push(next);
-    }
-}
-
 int find_path(Cell *end) {
     int counter = -1; //do not count the first node
     Cell *current = end;
@@ -74,6 +68,14 @@ void print_maze_state(Maze &maze, Cell *current, bool &print, int iteration_coun
         print = false;
     }
     move(0,0);
+}
+
+inline void process_cell_bfs(std::queue<Cell*> &queue, Cell *next, Cell *current) {
+    if (next->state == STATE::UNDISCOVERED) {
+        next->state = STATE::OPEN;
+        next->prev = current;
+        queue.push(next);
+    }
 }
 
 std::tuple<bool, int, int> bfs(Maze &maze, bool print) {
@@ -159,6 +161,61 @@ std::tuple<bool, int, int> dfs(Maze &maze, bool print) {
         }
         if ((next = down_cell(maze.grid, current))) {
             process_cell_dfs(stack, next, current);
+        }
+        current->state = STATE::CLOSED;
+
+        ++iteration_counter;
+        if(print) {
+            print_maze_state(maze, current, print, iteration_counter);
+        }
+    }
+
+    int path_length;
+    if(found_end) {
+        path_length = find_path(&maze.get_end_cell());
+    }
+
+    return {found_end, ++iteration_counter, path_length}; //last iteration not printed, need to increment counter
+}
+
+inline void process_cell_random_search(std::vector<Cell*> &vector, Cell *next, Cell *current) {
+    if (next->state == STATE::UNDISCOVERED) {
+        next->state = STATE::OPEN;
+        next->prev = current;
+        vector.push_back(next);
+    }
+}
+
+std::tuple<bool, int, int> random_search(Maze &maze, bool print) {
+    int iteration_counter = 0;
+    bool found_end = false;
+    std::vector<Cell*> vector;
+    maze.get_start_cell().state = STATE::OPEN;
+    vector.push_back(&maze.get_start_cell());
+    std::srand(std::time(nullptr));
+
+    while(!vector.empty()) {
+        int index = std::rand() % vector.size();
+        Cell *current = vector[index];
+        vector.erase(vector.begin() + index);
+
+        if (current->coords == maze.end) {
+            found_end = true;
+            break;
+        }
+
+        Cell *next;
+        if ((next = left_cell(maze.grid, current))) {
+            process_cell_random_search(vector, next, current);
+        }
+        if ((next = right_cell(maze.grid, current))) {
+            process_cell_random_search(vector, next, current);
+        }
+        if ((next = up_cell(maze.grid, current))) {
+            process_cell_random_search(vector, next, current);
+        }
+        if ((next = down_cell(maze.grid, current))) {
+            process_cell_random_search(vector, next, current);
         }
         current->state = STATE::CLOSED;
 
