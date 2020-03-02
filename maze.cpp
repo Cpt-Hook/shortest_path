@@ -7,10 +7,24 @@
 #include <sstream>
 #include <ncurses.h>
 
-Cell::Cell(char print_char, Coords coords, bool blank) :
-    prev(nullptr), coords(coords), state(STATE::UNDISCOVERED), print_char(print_char), blank(blank) {}
+Cell::Cell(Coords coords, bool blank) :
+    prev(nullptr), coords(coords), state(STATE::UNDISCOVERED), blank(blank) {}
 
-void Cell::print() const {
+char Cell::get_print_char() const {
+    if(!blank) {
+        return WALL_CHAR;
+    }else if(state == STATE::UNDISCOVERED) {
+        return BLANK_CHAR;
+    }else if(state == STATE::CLOSED) {
+        return CLOSED_CHAR;
+    }else if(state == STATE::OPEN) {
+        return OPEN_CHAR;
+    }
+    return PATH_CHAR;
+}
+
+void Cell::addchar() const {
+    char print_char = get_print_char();
     switch(print_char) {
         case PATH_CHAR:
             addch(print_char | COLOR_PAIR(GREEN_PAIR));
@@ -21,14 +35,18 @@ void Cell::print() const {
         case CLOSED_CHAR:
             addch(print_char | COLOR_PAIR(RED_PAIR));
             break;
-        case START_CHAR:
-        case END_CHAR:
-            addch(print_char | COLOR_PAIR(BLUE_PAIR));
-            break;
         default:
             addch(print_char);
             break;
     }
+}
+
+void Cell::addchar_start() {
+    addch(START_CHAR | COLOR_PAIR(BLUE_PAIR));
+}
+
+void Cell::addchar_end() {
+    addch(END_CHAR | COLOR_PAIR(BLUE_PAIR));
 }
 
 bool Maze::load_maze(std::istream &istream) {
@@ -56,15 +74,13 @@ bool Maze::load_maze(std::istream &istream) {
         }else {
             grid.emplace_back();
             for(char cell_char : line) {
-                grid.back().emplace_back(cell_char, current, cell_char == ' ');
+                grid.back().emplace_back(current, cell_char == ' ');
                 ++current.x;
             }
             current.x = 0;
             ++current.y;
         }
     }
-    grid[start.y][start.x].print_char = 'S';
-    grid[end.y][end.x].print_char = 'E';
     return true;
 }
 
@@ -86,16 +102,23 @@ std::ostream &operator<<(std::ostream &stream, const Coords &coords) {
 }
 
 std::ostream &operator<<(std::ostream &stream, const Cell &cell) {
-    stream << cell.print_char;
+    stream << cell.get_print_char();
     return stream;
 }
 
 std::ostream &operator<<(std::ostream &stream, const Maze &maze) {
-    for(const std::vector<Cell> &row : maze.grid) {
-       for(const Cell &cell : row) {
-           stream << cell;
-       }
-       stream << std::endl;
+    for(size_t i = 0; i < maze.grid.size(); ++i) {
+        for(size_t j = 0; j < maze.grid[0].size(); ++j) {
+            Coords current_coords = {(int)j, (int)i};
+            if(current_coords == maze.start) {
+                stream << START_CHAR;
+            }else if(current_coords == maze.end) {
+                stream << END_CHAR;
+            }else {
+                stream << maze.grid[i][j];
+            }
+        }
+        stream << std::endl;
     }
     return stream;
 }
@@ -105,11 +128,18 @@ bool Coords::operator==(const Coords &other) const {
 }
 
 void Maze::print_maze() const {
-    for(const std::vector<Cell> &row : grid) {
-       for(const Cell &cell : row) {
-           cell.print();
-       }
-       addch('\n');
+    for(size_t i = 0; i < grid.size(); ++i) {
+        for(size_t j = 0; j < grid[0].size(); ++j) {
+            Coords current_coords = {(int)j, (int)i};
+            if(current_coords == start) {
+                Cell::addchar_start();
+            }else if(current_coords == end) {
+                Cell::addchar_end();
+            }else {
+                grid[i][j].addchar();
+            }
+        }
+        addch('\n');
     }
     refresh();
 }

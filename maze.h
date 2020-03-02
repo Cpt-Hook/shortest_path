@@ -12,9 +12,10 @@ const char CLOSED_CHAR = '-';
 const char OPEN_CHAR = '#';
 const char START_CHAR = 'S';
 const char END_CHAR = 'E';
+const char BLANK_CHAR = ' ';
 
 enum class STATE {
-    OPEN, CLOSED, UNDISCOVERED
+    OPEN, CLOSED, UNDISCOVERED, PATH
 };
 
 enum COLOR_PAIR {
@@ -33,11 +34,14 @@ struct Cell {
     Cell *prev;
     Coords coords;
     STATE state;
-    char print_char;
     bool blank;
 
-    explicit Cell(char print_char, Coords coords, bool blank);
-    void print() const;
+    explicit Cell(Coords coords, bool blank);
+    char get_print_char() const;
+    void addchar() const;
+
+    static void addchar_start();
+    static void addchar_end();
 };
 
 std::ostream& operator<<(std::ostream &stream, const Cell &cell);

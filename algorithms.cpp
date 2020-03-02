@@ -42,8 +42,6 @@ inline void process_cell_bfs(std::queue<Cell*> &queue, Cell *next, Cell *current
     if (next->state == STATE::UNDISCOVERED) {
         next->state = STATE::OPEN;
         next->prev = current;
-        if(next->print_char != START_CHAR && next->print_char != END_CHAR)
-            next->print_char = OPEN_CHAR;
         queue.push(next);
     }
 }
@@ -53,8 +51,7 @@ int find_path(Cell *end) {
     Cell *current = end;
     while(current) {
         ++counter;
-        if(current->print_char != START_CHAR && current->print_char != END_CHAR)
-            current->print_char = PATH_CHAR;
+        current->state = STATE::PATH;
         current = current->prev;
     }
     return counter;
@@ -63,10 +60,20 @@ int find_path(Cell *end) {
 void revert_path(Cell *end) {
     Cell *current = end;
     while(current) {
-        if(current->print_char != START_CHAR && current->print_char != END_CHAR)
-            current->print_char = CLOSED_CHAR;
+        current->state = STATE::CLOSED;
         current = current->prev;
     }
+}
+
+void print_maze_state(Maze &maze, Cell *current, bool &print, int iteration_counter) {
+    printw("Iteration %d\n", iteration_counter);
+    find_path(current);
+    maze.print_maze();
+    revert_path(current);
+    if(getch() == 'q') {
+        print = false;
+    }
+    move(0,0);
 }
 
 std::tuple<bool, int, int> bfs(Maze &maze, bool print) {
@@ -99,21 +106,11 @@ std::tuple<bool, int, int> bfs(Maze &maze, bool print) {
             process_cell_bfs(queue, next, current);
         }
 
-        if(current->print_char != START_CHAR && current->print_char != END_CHAR) {
-            current->print_char = CLOSED_CHAR;
-        }
         current->state = STATE::CLOSED;
 
         ++iteration_counter;
         if(print) {
-            printw("Iteration %d\n", iteration_counter);
-            find_path(current);
-            maze.print_maze();
-            revert_path(current);
-            if(getch() == 'q') {
-                print = false;
-            }
-            move(0,0);
+            print_maze_state(maze, current, print, iteration_counter);
         }
     }
 
@@ -129,8 +126,6 @@ inline void process_cell_dfs(std::stack<Cell*> &stack, Cell *next, Cell *current
     if (next->state == STATE::UNDISCOVERED) {
         next->state = STATE::OPEN;
         next->prev = current;
-        if(next->print_char != START_CHAR && next->print_char != END_CHAR) 
-            next->print_char = OPEN_CHAR;
         stack.push(next);
     }
 }
@@ -165,21 +160,11 @@ std::tuple<bool, int, int> dfs(Maze &maze, bool print) {
         if ((next = down_cell(maze.grid, current))) {
             process_cell_dfs(stack, next, current);
         }
-        if(current->print_char != START_CHAR && current->print_char != END_CHAR) {
-            current->print_char = CLOSED_CHAR;
-        }
         current->state = STATE::CLOSED;
 
         ++iteration_counter;
         if(print) {
-            printw("Iteration %d\n", iteration_counter);
-            find_path(current);
-            maze.print_maze();
-            revert_path(current);
-            if(getch() == 'q') {
-                print = false;
-            }
-            move(0, 0);
+            print_maze_state(maze, current, print, iteration_counter);
         }
     }
 
