@@ -24,6 +24,7 @@ class DSWrapper {
 public:
     virtual ~DSWrapper() = default; 
 
+    virtual void process_cell(Cell *next, Cell *current);
     virtual void push(Cell *cell) = 0;
     virtual Cell* pop() = 0;
     virtual bool empty() = 0;

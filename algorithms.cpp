@@ -11,6 +11,14 @@
 #include <ctime>
 #include <stdexcept>
 
+void DSWrapper::process_cell(Cell *next, Cell *current) {
+    if (next->state == STATE::UNDISCOVERED) {
+        next->state = STATE::OPEN;
+        next->prev = current;
+        push(next);
+    }
+}
+
 class DFSWrapper : public DSWrapper {
 private:
     std::stack<Cell*> stack;
@@ -82,6 +90,18 @@ private:
     std::priority_queue<Cell*, std::vector<Cell*>, T> queue;
 
 public:
+    void process_cell(Cell *next, Cell *current) override {
+        if (next->state == STATE::UNDISCOVERED) {
+            next->state = STATE::OPEN;
+            next->prev = current;
+            next->path_length = current->path_length + 1;
+            push(next);
+        }else if(next->state == ::STATE::OPEN && next->path_length > current->path_length + 1) {
+            //next->path_length = current->path_length + 1;
+            //push(next);
+        }
+    }
+
     void push(Cell *cell) override {
         queue.push(cell);
     }
@@ -106,7 +126,11 @@ bool DijsktraCompare::operator()(Cell *first, Cell *second) {
 }
 
 bool AstarCompare::operator()(Cell *first, Cell *second) {
-    return first->path_length + first->heuristic > second->path_length + second->heuristic;
+    if(first->path_length + first->heuristic == second->path_length + second->heuristic) {
+        return first->path_length > second->path_length;
+    }else {
+        return first->path_length + first->heuristic > second->path_length + second->heuristic;
+    }
 }
 
 Solver::Solver(Maze &maze, ALGORITHM_NAME name) : maze(maze) {
@@ -199,12 +223,7 @@ void Solver::print_maze_state(Cell *current, bool &print, int iteration_counter)
 }
 
 void Solver::process_cell(Cell *next, Cell *current) {
-    if (next->state == STATE::UNDISCOVERED) {
-        next->state = STATE::OPEN;
-        next->prev = current;
-        next->path_length = current->path_length + 1;
-        ds->push(next);
-    }
+    ds->process_cell(next, current);
 }
 
 std::tuple<bool, int, int> Solver::solve(bool print) {
