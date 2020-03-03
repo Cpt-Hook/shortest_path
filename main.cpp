@@ -7,6 +7,11 @@
 #include "maze.h"
 #include "algorithms.h"
 
+const std::string help_string = 
+R"(Arguments: file_name algorithm [noprint]
+algorithm: 'dfs', 'bfs', 'random', 'greedy', 'dijkstra', 'astar'
+noprint: does not run an animation, only prints final path through the maze)";
+
 ALGORITHM_NAME check_algorithm_name(const std::string input) {
     if(input == dfs_string) {
         return ALGORITHM_NAME::DFS;
@@ -72,14 +77,14 @@ void normal_print(Solver &solver) {
 
 int main(int argc, char *argv[]) {
     if(argc < 3) {
-        std::cout << "Arguments: file_name algorithm [noprint]" << std::endl;
-        std::cout << "algorithm: 'dfs', 'bfs', 'random'" << std::endl;
+        std::cout << help_string << std::endl;
         return 1;
     }
 
     ALGORITHM_NAME algorithm = check_algorithm_name(argv[2]);
     if(algorithm == ALGORITHM_NAME::INVALID) {
         std::cout << "Bad algorithm" << std::endl;
+        std::cout << help_string << std::endl;
         return 1;
     }
 
