@@ -2,13 +2,14 @@
 // Created by standa on 2/23/20.
 //
 #include "maze.h"
+#include "algorithms.h"
 #include <iostream>
 #include <vector>
 #include <sstream>
 #include <ncurses.h>
 
 Cell::Cell(Coords coords, bool blank) :
-    prev(nullptr), coords(coords), state(STATE::UNDISCOVERED), blank(blank) {}
+    prev(nullptr), coords(coords), state(STATE::UNDISCOVERED), path_length(0), blank(blank) {}
 
 char Cell::get_print_char() const {
     if(!blank) {
@@ -49,6 +50,14 @@ void Cell::addchar_end() {
     addch(END_CHAR | COLOR_PAIR(BLUE_PAIR));
 }
 
+void Maze::compute_heuristic() {
+    for(std::vector<Cell> &row : grid) {
+        for(Cell &cell : row) {
+            cell.heuristic = std::abs(cell.coords.x - end.x) + std::abs(cell.coords.y - end.y);
+        }
+    }
+}
+
 bool Maze::load_maze(std::istream &istream) {
     std::string line;
     Coords current = {0, 0};
@@ -81,6 +90,7 @@ bool Maze::load_maze(std::istream &istream) {
             ++current.y;
         }
     }
+    compute_heuristic();
     return true;
 }
 
@@ -143,4 +153,3 @@ void Maze::print_maze() const {
     }
     refresh();
 }
-

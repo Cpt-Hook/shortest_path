@@ -34,6 +34,8 @@ struct Cell {
     Cell *prev;
     Coords coords;
     STATE state;
+    int path_length;
+    int heuristic;
     bool blank;
 
     explicit Cell(Coords coords, bool blank);
@@ -57,6 +59,7 @@ public:
 
     bool load_maze(std::istream &stream=std::cin);
     void print_maze() const;
+    void compute_heuristic();
 
     Cell& get_cell(Coords coords);
     Cell& get_start_cell();

@@ -7,14 +7,6 @@
 #include "maze.h"
 #include "algorithms.h"
 
-enum class ALGORITHM_NAME {
-    INVALID, DFS, BFS, RANDOM
-};
-
-const std::string dfs_string = "dfs";
-const std::string bfs_string = "bfs";
-const std::string random_string = "random";
-
 ALGORITHM_NAME check_algorithm_name(const std::string input) {
     if(input == dfs_string) {
         return ALGORITHM_NAME::DFS;
@@ -22,25 +14,14 @@ ALGORITHM_NAME check_algorithm_name(const std::string input) {
         return ALGORITHM_NAME::BFS;
     }else if(input == random_string) {
         return ALGORITHM_NAME::RANDOM;
+    }else if(input == greedy_string){
+        return ALGORITHM_NAME::GREEDY;
+    }else if(input == astar_string){
+        return ALGORITHM_NAME::ASTAR;
+    }else if(input == dijkstra_string){
+        return ALGORITHM_NAME::DIJKSTRA;
     }else {
         return ALGORITHM_NAME::INVALID;
-    }
-}
-
-std::tuple<bool, int, int> run_algorithm(ALGORITHM_NAME name, Maze &maze, bool print) {
-    switch(name) {
-        case ALGORITHM_NAME::BFS:
-            return bfs(maze, print);
-            break;
-        case ALGORITHM_NAME::DFS:
-            return dfs(maze, print);
-            break;
-        case ALGORITHM_NAME::RANDOM:
-            return random_search(maze, print);
-            break;
-        default:
-            return {false, -1, -1}; // should never happen
-            break;
     }
 }
 
@@ -57,17 +38,17 @@ void init_ncurses() {
     init_pair(GREEN_PAIR, COLOR_GREEN, -1);
 }
 
-void ncurses_print(ALGORITHM_NAME algorithm, Maze &maze) {
+void ncurses_print(Solver &solver) {
     init_ncurses();
 
-    auto [found_end, iteration_counter, path_length] = run_algorithm(algorithm, maze, true);
+    auto [found_end, iteration_counter, path_length] = solver.solve(true);
 
     if(found_end) {
         printw("Iteration count: %d, path length: %d\n", iteration_counter, path_length);
     }else {
         printw("Iteration count: %d, path not found\n", iteration_counter);
     }
-    maze.print_maze();
+    solver.maze.print_maze();
 
     printw("Press q to quit");
     int input;
@@ -78,15 +59,15 @@ void ncurses_print(ALGORITHM_NAME algorithm, Maze &maze) {
     endwin();
 }
 
-void normal_print(ALGORITHM_NAME algorithm, Maze &maze) {
-    auto [found_end, iteration_counter, path_length] = run_algorithm(algorithm, maze, false);
+void normal_print(Solver &solver) {
+    auto [found_end, iteration_counter, path_length] = solver.solve(false);
 
     if(found_end) {
         std::cout << "Iteration count: " << iteration_counter << ", path length: " << path_length << std::endl;
     }else {
         std::cout << "Iteration count: " << iteration_counter << ", path not found" << std::endl;
     }
-    std::cout << maze;
+    std::cout << solver.maze;
 }
 
 int main(int argc, char *argv[]) {
@@ -115,10 +96,11 @@ int main(int argc, char *argv[]) {
     }
 
     bool print = !(argc >= 4 && strcmp(argv[3], "noprint") == 0);
+    Solver solver(maze, algorithm);
 
     if(print) {
-        ncurses_print(algorithm, maze);
+        ncurses_print(solver);
     } else {
-        normal_print(algorithm, maze);
+        normal_print(solver);
     }
 }
