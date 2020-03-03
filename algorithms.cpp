@@ -4,6 +4,7 @@
 
 #include "algorithms.h"
 #include <queue>
+#include <set>
 #include <tuple>
 #include <stack>
 #include <ncurses.h>
@@ -87,49 +88,75 @@ public:
 template <typename T>
 class PriorityQueueWrapper : public DSWrapper {
 private:
-    std::priority_queue<Cell*, std::vector<Cell*>, T> queue;
+    std::multiset<Cell*, T> set;
 
 public:
+    void push(Cell *cell) override {
+        set.insert(cell);
+    }
+
+    Cell* pop() override {
+        auto first_iterator = set.begin();
+        Cell *temp = *first_iterator;
+        set.erase(first_iterator);
+        return temp;
+    }
+
+    bool empty() override {
+        return set.empty();
+    }
+
+protected:
+    void remove(Cell* cell) {
+        set.erase(cell);
+    }
+};
+
+class GreedyWrapper : public PriorityQueueWrapper<GreedyCompare> {};
+
+class DijkstraWrapper : public PriorityQueueWrapper<DijsktraCompare> {
     void process_cell(Cell *next, Cell *current) override {
         if (next->state == STATE::UNDISCOVERED) {
             next->state = STATE::OPEN;
             next->prev = current;
             next->path_length = current->path_length + 1;
             push(next);
-        }else if(next->state == ::STATE::OPEN && next->path_length > current->path_length + 1) {
-            //next->path_length = current->path_length + 1;
-            //push(next);
+        }else if(next->state == STATE::OPEN && next->path_length > current->path_length + 1) {
+            remove(next); 
+            next->path_length = current->path_length + 1;
+            push(next);
         }
     }
+};
 
-    void push(Cell *cell) override {
-        queue.push(cell);
-    }
-
-    Cell* pop() override {
-        Cell *temp = queue.top();
-        queue.pop();
-        return temp;
-    }
-
-    bool empty() override {
-        return queue.empty();
+class AstarWrapper : public PriorityQueueWrapper<AstarCompare> {
+    void process_cell(Cell *next, Cell *current) override {
+        if (next->state == STATE::UNDISCOVERED) {
+            next->state = STATE::OPEN;
+            next->prev = current;
+            next->path_length = current->path_length + 1;
+            push(next);
+        }else if(next->state == STATE::OPEN && next->path_length + next->heuristic > current->path_length + 1 + current->heuristic) {
+            remove(next); 
+            next->path_length = current->path_length + 1;
+            push(next);
+        }
     }
 };
 
 bool GreedyCompare::operator()(Cell *first, Cell *second) {
-    return first->heuristic > second->heuristic;
+    return first->heuristic < second->heuristic;
 }
 
 bool DijsktraCompare::operator()(Cell *first, Cell *second) {
-    return first->path_length > second->path_length;
+    return first->path_length < second->path_length;
 }
 
 bool AstarCompare::operator()(Cell *first, Cell *second) {
     if(first->path_length + first->heuristic == second->path_length + second->heuristic) {
-        return first->path_length > second->path_length;
+        return first->path_length < second->path_length;
     }else {
-        return first->path_length + first->heuristic > second->path_length + second->heuristic;
+        return first->path_length + first->heuristic < second->path_length + second->heuristic;
     }
 }
 
@@ -145,13 +172,13 @@ Solver::Solver(Maze &maze, ALGORITHM_NAME name) : maze(maze) {
             ds = new RandomWrapper;
             break;
         case ALGORITHM_NAME::GREEDY:
-            ds = new PriorityQueueWrapper<GreedyCompare>;
+            ds = new GreedyWrapper;
             break;
         case ALGORITHM_NAME::ASTAR:
-            ds = new PriorityQueueWrapper<AstarCompare>;
+            ds = new AstarWrapper;
             break;
         case ALGORITHM_NAME::DIJKSTRA:
-            ds = new PriorityQueueWrapper<DijsktraCompare>;
+            ds = new DijkstraWrapper;
             break;
         default:
             throw std::invalid_argument("Invalid algorithm name not caught");
