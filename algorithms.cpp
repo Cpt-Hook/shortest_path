@@ -260,6 +260,7 @@ std::tuple<bool, int, int> Solver::solve(bool print) {
     ds->push(&maze.get_start_cell());
 
     while (!ds->empty()) {
+        ++iteration_counter;
         Cell *current = ds->pop();
 
         if (current->coords == maze.end) {
@@ -283,7 +284,6 @@ std::tuple<bool, int, int> Solver::solve(bool print) {
 
         current->state = STATE::CLOSED;
 
-        ++iteration_counter;
         if(print) {
             print_maze_state(current, print, iteration_counter);
         }
@@ -294,5 +294,5 @@ std::tuple<bool, int, int> Solver::solve(bool print) {
         path_length = find_path(&maze.get_end_cell());
     }
 
-    return {found_end, ++iteration_counter, path_length}; //last iteration not printed, need to increment counter
+    return {found_end, iteration_counter, path_length}; //last iteration not printed, need to increment counter
 }
