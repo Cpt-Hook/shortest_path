@@ -54,17 +54,17 @@ private:
 
 class GreedyCompare {
 public:
-    bool operator()(Cell *first, Cell *second);
+    bool operator()(Cell *first, Cell *second) const;
 };
 
 class DijsktraCompare {
 public:
-    bool operator()(Cell *first, Cell *second);
+    bool operator()(Cell *first, Cell *second) const;
 };
 
 class AstarCompare {
 public:
-    bool operator()(Cell *first, Cell *second);
+    bool operator()(Cell *first, Cell *second) const;
 };
 
 #endif //STATE_SPACE_SEARCH_ALGORITHMS_H

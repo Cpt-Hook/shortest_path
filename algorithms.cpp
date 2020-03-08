@@ -144,15 +144,15 @@ class AstarWrapper : public PriorityQueueWrapper<AstarCompare> {
     }
 };
 
-bool GreedyCompare::operator()(Cell *first, Cell *second) {
+bool GreedyCompare::operator()(Cell *first, Cell *second) const {
     return first->heuristic < second->heuristic;
 }
 
-bool DijsktraCompare::operator()(Cell *first, Cell *second) {
+bool DijsktraCompare::operator()(Cell *first, Cell *second) const {
     return first->path_length < second->path_length;
 }
 
-bool AstarCompare::operator()(Cell *first, Cell *second) {
+bool AstarCompare::operator()(Cell *first, Cell *second) const {
     if(first->path_length + first->heuristic == second->path_length + second->heuristic) {
         return first->path_length < second->path_length;
     }else {
