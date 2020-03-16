@@ -4,7 +4,7 @@ LDLIBS := -lncurses
 OBJS := main.o algorithms.o maze.o
 BINARY := main.out
 
-.PHONY: all clean debug
+.PHONY: all clean debug help
 
 debug: CXXFLAGS += -g -fsanitize=address
 
@@ -18,3 +18,6 @@ debug: all
 
 clean:
 	-rm -f *.o ${BINARY}
+
+help:
+	@cat README.txt
