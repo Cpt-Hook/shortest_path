@@ -21,3 +21,4 @@ Poznamka:
     Testovaci data jsou pro animaci celkem velka - bludiste se nevleze do terminalu. Bud pouzijte moznost noprint, nebo staci nastavit mensi font.
     Prvni 2 soubory z prikladu spusteni programu se k animaci celkem hodi.
     'o' - cesta, '-' - uzavrene policko, '#' - otevrene policko, 'S' - zacatek, 'E' - konec
+    Implementace algoritmu je v souboru algorithms.cpp jako posledni metoda - jelikoz jsou algoritmy velmi podobne, implementoval jsem je vsechny stejnou funkci ktere se dodava jina datova struktura pro ukladani a vybirani policek a jinak zpracovavaji otevrene policka (nektere pocitaji heuristiku/delku cesty).
